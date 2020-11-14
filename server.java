@@ -105,90 +105,37 @@ class clientThread extends Thread
 			String userSelectedName; 
 			String userSelectedPassword; 
 			
+			// username
+			outToClient.println("*** Enter your username ***");
+			userSelectedName = inFromClient.readLine().trim();
 
-			//Scanner scan = new Scanner(System.in); 
-			//outToClient.println("*** Returning User? Yes or No? ***");
-			//String returningUser = inFromClient.readLine().trim();
-		
-			// EXISTING USER ----------------------------------------------------
-			//if (returningUser.startsWith("Y") || returningUser.startsWith("y"))
-			//{
-				// username
-				outToClient.println("*** Enter your username ***");
-				userSelectedName = inFromClient.readLine().trim();
+			if (userSelectedName.isEmpty())
+			{
+				outToClient.println("You must enter a username");
+			}
 
-				if (userSelectedName.isEmpty())
-				{
-					outToClient.println("You must enter a username");
-				}
-
-				// password
-				//outToClient.println("*** Enter your password ***");
-				//userSelectedPassword = inFromClient.readLine().trim();	
-
-				//if (userSelectedPassword.isEmpty())
-				//{
-				//	outToClient.println("You must enter a password");
-				//}
-
-				// verify username/password
-				// allowedToEnter = verifyLoginCredentials(userSelectedName, userSelectedPassword); 
-			//}
+			outToClient.println("*** Welcome " + userSelectedName + "! You have successfully connected!\nEnter your message below and press Enter to send. To leave, type \"/quit\" and press Enter. ***");
 			
-			// NEW USER ----------------------------------------------------------
-			//else 
-			//{
-				// username
-				//outToClient.println("*** Pick a username ***");
-				//userSelectedName = inFromClient.readLine().trim();
-
-				//if (userSelectedName.isEmpty())
-				//{
-					//outToClient.println("You must enter a username");
-				//}
-
-				// password
-				////outToClient.println("*** Pick a password ***");
-				//userSelectedPassword = inFromClient.readLine().trim();
-
-				//if (userSelectedPassword.isEmpty())
-				//{
-				//	outToClient.println("You must enter a password");
-				//}
-
-				// store username and password 
-				//writeToFile(userSelectedName, userSelectedPassword); 
-
-				// let them in 
-				//allowedToEnter = true; 
-			//}
-
-			// IF AUTHENTICATED ----------------------------------------------------------
-			//if (allowedToEnter == true)
-			//{
-				outToClient.println("*** Welcome " + userSelectedName + "! You have successfully connected!\nEnter your message below and press Enter to send. To leave, type \"/quit\" and press Enter. ***");
-				
-				// set this thread's (this client's) name to the name the user selected
-				synchronized (this) 
+			// set this thread's (this client's) name to the name the user selected
+			synchronized (this) 
+			{
+				for (int i = 0; i < maxClientsCount; i++) 
 				{
-					for (int i = 0; i < maxClientsCount; i++) 
+					if (threads[i] != null && threads[i] == this) 
 					{
-						if (threads[i] != null && threads[i] == this) 
-						{
-							clientName = userSelectedName; 
-							break;
-						}
+						clientName = userSelectedName; 
+						break;
 					}
-					
-					// alert all other users a new user has arrived 
-					for (int i = 0; i < maxClientsCount; i++) 
+				}
+				
+				// alert all other users a new user has arrived 
+				for (int i = 0; i < maxClientsCount; i++) 
+				{
+					if (threads[i] != null && threads[i] != this) 
 					{
-						if (threads[i] != null && threads[i] != this) 
-						{
-							threads[i].outToClient.println("*** A new user " + userSelectedName + " entered! ***");
-						}
+						threads[i].outToClient.println("*** A new user " + userSelectedName + " entered! ***");
 					}
-				//}
+				}
 				
 				// FACILITATE CHAT ----------------------------------------------------------
 				try 
@@ -231,7 +178,7 @@ class clientThread extends Thread
 				{
 					System.out.println(userSelectedName + " quit");
 				}
-				
+
 				// tell everyone who left 
 				synchronized (this) 
 				{
@@ -262,114 +209,10 @@ class clientThread extends Thread
 				outToClient.close();
 				clientSocket.close();
 			}
-			
-			// IF NOT AUTHENTICATED - CLOSE CONNECTION ----------------------------------------------------------
-			// else 
-			//{
-				//inFromClient.close();
-				//outToClient.close();
-				//clientSocket.close();
-			//}
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
 	}
-
-	// REGISTER NEW USERS ----------------------------------------------------------
-	// https://stackoverflow.com/questions/19234995/saving-retrieving-usernames-and-passwords-in-java-text-file
-//	public boolean writeToFile(String userSelectedName, String userSelectedPassword) throws IOException 
-//	{
-//		// if the file doesn't exist, make one, otherwise just add to it - to do 
-//		// true here allows us to append to the file - turns on append mode 
-//		BufferedWriter outToFile = new BufferedWriter(new FileWriter("authentication.txt", true));
-//
-//		try
-//		{
-//			Scanner fileScan = new Scanner(new File("authentication.txt"));
-//			// while there are lines to scan (scan the entire file)
-//
-//			while(fileScan.hasNext())
-//			{
-//				// scan a whole line 
-//				String wholeLine = fileScan.next();
-//
-//				// create an array with the username in one spot, password in another spot 
-//				String[] usernameAndPasswordArray = wholeLine.split(":");
-//
-//				// separate just the username 
-//				String usernameFromFile = usernameAndPasswordArray[0];
-//
-//				if(userSelectedName.equals(usernameFromFile))
-//				{
-//					outToClient.println("Username already exists");
-//					// allowedToEnter = false; 
-//               return false;
-//				}
-//				// WRITE USERNAME & PASSWORD TO FILE
-//				else 
-//				{
-//					outToFile.write(userSelectedName + ":" + userSelectedPassword);
-//					outToFile.newLine();
-//					break; 
-//				}
-//			}
-//			outToFile.close();
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace(); 
-//		}
-//      return true;
-//	}
-
-	// VERIFY EXISTING USERS ----------------------------------------------------------
-//	public boolean verifyLoginCredentials(String userSelectedName, String userSelectedPassword)
-//	{	
-//		try
-//		{
-//			Scanner fileScan = new Scanner(new File("authentication.txt"));
-//
-//			// while there are lines to scan (scan the entire file)
-//			while(fileScan.hasNext())
-//			{
-//				// scan a whole line 
-//				String wholeLine = fileScan.next();
-//
-//				// create an array with the username in one spot, password in another spot 
-//				String[] usernameAndPasswordArray = wholeLine.split(":");
-//
-//				// separate just the username 
-//				String usernameFromFile = usernameAndPasswordArray[0];
-//
-//				// separate just the password
-//				String passwordFromFile = usernameAndPasswordArray[1];
-//
-//				if(userSelectedName.equals(usernameFromFile))
-//				{
-//					outToClient.println("I found your username");
-//
-//					if(userSelectedPassword.equals(passwordFromFile))
-//					{
-//						outToClient.println("And that was the right password"); 
-//						return true; 
-//					}
-//					else 
-//					{
-//						outToClient.println("Incorrect Password. Press Enter."); 
-//						return false; 
-//					}
-//				}
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//
-//		// if got here 
-//		outToClient.println("Username not found. Press Enter."); 
-//		return false;
-//	}
 }
