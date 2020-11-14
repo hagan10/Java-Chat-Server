@@ -94,7 +94,7 @@ class clientThread extends Thread
 	{
 		int maxClientsCount = this.maxClientsCount;
 		clientThread[] threads = this.threads;
-      boolean allowedToEnter = false; 
+  
 		try 
 		{
 			// set up input & output streams 
