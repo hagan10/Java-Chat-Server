@@ -11,7 +11,7 @@ public class server
 	private static ServerSocket serverSocket = null;
 	private static Socket clientSocket = null;
 	// This chat server can accept up to maxClientsCount clients' connections.
-	private static final int maxNumberOfClients = 10;
+	private static final int maxNumberOfClients = 2;
 	// an array of client Threads - creating space for the maxNumberOfClients to each have their own thread 
 	private static final clientThread[] threads = new clientThread[maxNumberOfClients];
 
